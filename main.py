@@ -9,7 +9,7 @@
 
 ################################################################
 ################################################################
-version = '1.0'
+version = '1.1'
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
@@ -26,15 +26,15 @@ class Entry():
             self.level = 0 
             self.powerup = 0 
             self.unk3 = 0
-            self.unk4 = 0
-            self.unk5 = 0 
+            self.end = 0
+            self.type = 0 
             self.catid = 0
             self.unk6 = 0
             self.world = 0
             self.unk7 = 0
             self.unk8 = 0
             self.prequel = 0 # Unknown effect
-            self.unk9 = 0
+            self.complete = 0
             self.unk10 = 0
             self.time = 0 
             self.stars = 0 
@@ -53,15 +53,15 @@ class Entry():
         self.level = data[1]
         self.powerup = data[2]
         self.unk3 = data[3]
-        self.unk4 = data[4]
-        self.unk5 = data[5]
+        self.end = data[4]
+        self.type = data[5]
         self.catid = data[6]
         self.unk6 = data[7]
         self.world = data[8]
         self.unk7 = data[9]
         self.unk8 = data[10]
         self.prequel = data[11]
-        self.unk9 = data[12]
+        self.complete = data[12]
         self.unk10 = data[13]
         self.time = data[14]
         self.stars = data[15]
@@ -76,8 +76,8 @@ class Entry():
 
     def save(self):
         """Returns the entry"""
-        data = struct.pack(">10I2iIi5I2i3I", self.babyyoshi, self.level, self.powerup, self.unk3, self.unk4, self.unk5, self.catid, self.unk6, self.world, self.unk7,
-            self.unk8, self.prequel, self.unk9, self.unk10, self.time, self.stars, self.area, self.entrance, self.id, self.unk15, self.unk16, self.bronzeminimum,
+        data = struct.pack(">10I2iIi5I2i3I", self.babyyoshi, self.level, self.powerup, self.unk3, self.end, self.type, self.catid, self.unk6, self.world, self.unk7,
+            self.unk8, self.prequel, self.complete, self.unk10, self.time, self.stars, self.area, self.entrance, self.id, self.unk15, self.unk16, self.bronzeminimum,
             self.silverminimum, self.goldenminimum)
         return bytearray(data)
 
@@ -223,22 +223,6 @@ class ChallengeViewer(QtWidgets.QWidget):
         unk3L.addWidget(self.unk3)
         LL.addLayout(unk3L)
 
-        self.unk4 = QtWidgets.QLineEdit()
-        self.unk4.setFixedWidth(30)
-
-        unk4L = QtWidgets.QHBoxLayout()
-        unk4L.addWidget(QtWidgets.QLabel("Unknown 4 (0x10):"))
-        unk4L.addWidget(self.unk4)
-        LL.addLayout(unk4L)
-
-        self.unk5 = QtWidgets.QLineEdit()
-        self.unk5.setFixedWidth(30)
-
-        unk5L = QtWidgets.QHBoxLayout()
-        unk5L.addWidget(QtWidgets.QLabel("Unknown 5 (0x14):"))
-        unk5L.addWidget(self.unk5)
-        LL.addLayout(unk5L)
-
         self.unk6 = QtWidgets.QLineEdit()
         self.unk6.setFixedWidth(30)
 
@@ -265,14 +249,6 @@ class ChallengeViewer(QtWidgets.QWidget):
         unk8L.addWidget(QtWidgets.QLabel("Unknown 8 (0x28):"))
         unk8L.addWidget(self.unk8)
         RL.addLayout(unk8L)
-
-        self.unk9 = QtWidgets.QLineEdit()
-        self.unk9.setFixedWidth(30)
-
-        unk9L = QtWidgets.QHBoxLayout()
-        unk9L.addWidget(QtWidgets.QLabel("Unknown 9 (0x30):"))
-        unk9L.addWidget(self.unk9)
-        RL.addLayout(unk9L)
 
         self.unk10 = QtWidgets.QLineEdit()
         self.unk10.setFixedWidth(30)
@@ -364,6 +340,15 @@ class ChallengeViewer(QtWidgets.QWidget):
         babyyoshiL.addWidget(self.babyyoshi)
         q.addLayout(babyyoshiL)
 
+        # Completed Challenges Number
+        self.complete = QtWidgets.QLineEdit()
+        self.complete.setFixedWidth(40)
+
+        completeL = QtWidgets.QHBoxLayout()
+        completeL.addWidget(QtWidgets.QLabel("# of Completed Challenges:"))
+        completeL.addWidget(self.complete)
+        q.addLayout(completeL)
+
         # Prequel ID
         self.prequel = QtWidgets.QLineEdit()
         self.prequel.setFixedWidth(40)
@@ -373,6 +358,28 @@ class ChallengeViewer(QtWidgets.QWidget):
         IDL.addWidget(QtWidgets.QLabel("Prequel ID:"))
         IDL.addWidget(self.prequel)
         q.addLayout(IDL)
+
+        #Challenge End 
+        self.end = QtWidgets.QComboBox()
+        self.end.setEnabled(False)
+        self.end.setFixedWidth(200)
+        
+        end = QtWidgets.QHBoxLayout()
+        end.addWidget(QtWidgets.QLabel("Challenge End:"))
+        end.addStretch(1)
+        end.addWidget(self.end)
+        q.addLayout(end)
+
+        #Challenge Type
+        self.type = QtWidgets.QComboBox()
+        self.type.setEnabled(False)
+        self.type.setFixedWidth(200)
+
+        typeL = QtWidgets.QHBoxLayout()
+        typeL.addWidget(QtWidgets.QLabel("Challenge Type:"))
+        typeL.addStretch(1)
+        typeL.addWidget(self.type)
+        q.addLayout(typeL)
 
         CGB.setLayout(q)
 
@@ -420,6 +427,8 @@ class ChallengeViewer(QtWidgets.QWidget):
         self.Category.addItems(("Time Attack", "Coin Collection", "1-UP Rally", "Special", "Boost Mode"))
         self.powerup.addItems(("Small", "Super Mushroom", "Fire Flower", "Mini Mushroom", "Propeller Mushroom", "Penguin Suit", "Ice Flower", "Acorn Mushroom", "P-Acorn Mushroom"))
         self.babyyoshi.addItems(("None", "Blue Baby Yoshi", "Pink Baby Yoshi", "Yellow Baby Yoshi*"))
+        self.end.addItems(("None", "Huckit Leaves Screen", "Collected All Coins", "Collected 1 Coin", "Walks After Gliding", "Touched Ground After Killing Enemy", "Touched Ground", "Touched Snake Block", "Touched Elevator", "Collected Powerup or Took Damage", "Took Damage", "Killed Monty Mole", "Unknown", "Touched Ground", "Unknown", "Baby Yoshi Died", "Enemy Touched or Collected 1 Coin", "Player Ran", "Collected Star Coin"))
+        self.type.addItems(("Time Trial", "Most Coins", "Least Coins", "Most Lives", "Least Enemies Hit", "Reach Goal", "Unknown", "Unknown", "Unknown", "Unknown", "Survival"))
         self.challenge = 0
         self.updateFields(self.challenge)
 
@@ -428,6 +437,8 @@ class ChallengeViewer(QtWidgets.QWidget):
         self.Category.setEnabled(True)
         self.powerup.setEnabled(True)
         self.babyyoshi.setEnabled(True)
+        self.end.setEnabled(True)
+        self.type.setEnabled(True)
 
     def saveFile(self):
         """Returns the file in saved form"""
@@ -458,12 +469,12 @@ class ChallengeViewer(QtWidgets.QWidget):
         self.prequel.setText(          str(challenge.prequel)      )
         self.time.setValue(            challenge.time              )
         self.unk3.setText(             str(challenge.unk3)         )
-        self.unk4.setText(             str(challenge.unk4)         )
-        self.unk5.setText(             str(challenge.unk5)         )
+        self.end.setCurrentIndex(      challenge.end               )
+        self.type.setCurrentIndex(     challenge.type              )
         self.unk6.setText(             str(challenge.unk6)         )
         self.unk7.setText(             str(challenge.unk7)         )
         self.unk8.setText(             str(challenge.unk8)         )
-        self.unk9.setText(             str(challenge.unk9)         )
+        self.complete.setText(             str(challenge.complete)         )
         self.unk10.setText(            str(challenge.unk10)        )
         self.area.setText(             str(challenge.area + 1)     )
         self.entrance.setText(         str(challenge.entrance)     )
@@ -507,12 +518,12 @@ class ChallengeViewer(QtWidgets.QWidget):
         challenge.stars =         self.stars.count()
         challenge.entrance =      int(self.entrance.text())
         challenge.unk3 =          int(self.unk3.text())
-        challenge.unk4 =          int(self.unk4.text())
-        challenge.unk5 =          int(self.unk5.text())
+        challenge.end =          int(self.end.text())
+        challenge.type =          int(self.type.text())
         challenge.unk6 =          int(self.unk6.text())
         challenge.unk7 =          int(self.unk7.text())
         challenge.unk8 =          int(self.unk8.text())
-        challenge.unk9 =          int(self.unk9.text())
+        challenge.complete =          int(self.complete.text())
         challenge.unk10 =         int(self.unk10.text())
         challenge.area  =         int(self.area.text()) - 1
         challenge.unk15 =         int(self.unk15.text())
