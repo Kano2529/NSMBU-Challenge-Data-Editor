@@ -9,7 +9,7 @@
 
 ################################################################
 ################################################################
-version = '1.1'
+version = '1.2'
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
@@ -25,7 +25,7 @@ class Entry():
             self.babyyoshi = 0
             self.level = 0 
             self.powerup = 0 
-            self.unk3 = 0
+            self.mechanics = 0
             self.end = 0
             self.type = 0 
             self.catid = 0
@@ -41,8 +41,8 @@ class Entry():
             self.area = 0
             self.entrance = 0 
             self.id = 0
-            self.unk15 = 0
-            self.unk16 = 0
+            self.lvldisplay = 0
+            self.worldisplay = 0
             self.bronzeminimum = 0
             self.silverminimum = 0
             self.goldenminimum = 0
@@ -52,7 +52,7 @@ class Entry():
         self.babyyoshi = data[0]
         self.level = data[1]
         self.powerup = data[2]
-        self.unk3 = data[3]
+        self.mechanics = data[3]
         self.end = data[4]
         self.type = data[5]
         self.catid = data[6]
@@ -68,16 +68,16 @@ class Entry():
         self.area = data[16]
         self.entrance = data[17]
         self.id = data[18]
-        self.unk15 = data[19]
-        self.unk16 = data[20]
+        self.lvldisplay = data[19]
+        self.worldisplay = data[20]
         self.bronzeminimum = data[21]
         self.silverminimum = data[22]
         self.goldenminimum = data[23]
 
     def save(self):
         """Returns the entry"""
-        data = struct.pack(">10I2iIi5I2i3I", self.babyyoshi, self.level, self.powerup, self.unk3, self.end, self.type, self.catid, self.unk6, self.world, self.unk7,
-            self.unk8, self.prequel, self.complete, self.unk10, self.time, self.stars, self.area, self.entrance, self.id, self.unk15, self.unk16, self.bronzeminimum,
+        data = struct.pack(">10I2iIi5I2i3I", self.babyyoshi, self.level, self.powerup, self.mechanics, self.end, self.type, self.catid, self.unk6, self.world, self.unk7,
+            self.unk8, self.prequel, self.complete, self.unk10, self.time, self.stars, self.area, self.entrance, self.id, self.lvldisplay, self.worldisplay, self.bronzeminimum,
             self.silverminimum, self.goldenminimum)
         return bytearray(data)
 
@@ -208,20 +208,36 @@ class ChallengeViewer(QtWidgets.QWidget):
 
         areanentrance.addLayout(entranceL)
 
-        location.setLayout(areanentrance)
+        #location.setLayout(areanentrance)
 
+
+        #Display World & Level
+        self.worldisplay = QtWidgets.QLineEdit()
+        self.worldisplay.setFixedWidth(20)
+        self.worldisplay.setMaxLength(2)
+        self.lvldisplay = QtWidgets.QLineEdit()
+        self.lvldisplay.setFixedWidth(20)
+        self.lvldisplay.setMaxLength(2)
+        minus = QtWidgets.QLabel("-")
+        minus.setFixedWidth(5)
+
+        
+        worldisplayL = QtWidgets.QHBoxLayout()
+        worldisplayL.addWidget(QtWidgets.QLabel("Original Course Override"))
+        worldisplayL.addStretch(1)
+        worldisplayL.addWidget(self.worldisplay)
+        worldisplayL.addWidget(minus)
+        worldisplayL.addWidget(self.lvldisplay)
+
+        areanentrance.addLayout(worldisplayL)
+
+        location.setLayout(areanentrance)
+        
         # Unknowns
         # Left column
         UNKS = QtWidgets.QGroupBox("Unknown Values")
 
         LL = QtWidgets.QVBoxLayout()
-        self.unk3 = QtWidgets.QLineEdit()
-        self.unk3.setFixedWidth(30)
-
-        unk3L = QtWidgets.QHBoxLayout()
-        unk3L.addWidget(QtWidgets.QLabel("Unknown 3 (0x0C):"))
-        unk3L.addWidget(self.unk3)
-        LL.addLayout(unk3L)
 
         self.unk6 = QtWidgets.QLineEdit()
         self.unk6.setFixedWidth(30)
@@ -258,21 +274,6 @@ class ChallengeViewer(QtWidgets.QWidget):
         unk10L.addWidget(self.unk10)
         RL.addLayout(unk10L)
 
-        self.unk15 = QtWidgets.QLineEdit()
-        self.unk15.setFixedWidth(30)
-
-        unk15L = QtWidgets.QHBoxLayout()
-        unk15L.addWidget(QtWidgets.QLabel("Unknown 15 (0x4C):"))
-        unk15L.addWidget(self.unk15)
-        RL.addLayout(unk15L)
-
-        self.unk16 = QtWidgets.QLineEdit()
-        self.unk16.setFixedWidth(30)
-
-        unk16L = QtWidgets.QHBoxLayout()
-        unk16L.addWidget(QtWidgets.QLabel("Unknown 16 (0x50):"))
-        unk16L.addWidget(self.unk16)
-        RL.addLayout(unk16L)
 
         UNKL = QtWidgets.QHBoxLayout()
         UNKL.addLayout(LL)
@@ -381,11 +382,24 @@ class ChallengeViewer(QtWidgets.QWidget):
         typeL.addWidget(self.type)
         q.addLayout(typeL)
 
+        #Enabled Mechanics
+        self.mechanics = QtWidgets.QComboBox()
+        self.mechanics.setEnabled(False)
+        self.mechanics.setFixedWidth(200)
+
+        mechanicsL = QtWidgets.QHBoxLayout()
+        mechanicsL.addWidget(QtWidgets.QLabel("Enabled Mechanics"))
+        mechanicsL.addStretch(1)
+        mechanicsL.addWidget(self.mechanics)
+        q.addLayout(mechanicsL)
+
         CGB.setLayout(q)
 
         BTMH = QtWidgets.QHBoxLayout()
         BTMH.addWidget(CGB)
         BTMH.addWidget(TGB)
+
+
 
         # Save button
         self.save = QtWidgets.QPushButton("Save this challenge")
@@ -429,6 +443,7 @@ class ChallengeViewer(QtWidgets.QWidget):
         self.babyyoshi.addItems(("None", "Blue Baby Yoshi", "Pink Baby Yoshi", "Yellow Baby Yoshi*"))
         self.end.addItems(("None", "Huckit Leaves Screen", "Collected All Coins", "Collected 1 Coin", "Walks After Gliding", "Touched Ground After Killing Enemy", "Touched Ground", "Touched Snake Block", "Touched Elevator", "Collected Powerup or Took Damage", "Took Damage", "Killed Monty Mole", "Unknown", "Touched Ground", "Unknown", "Baby Yoshi Died", "Enemy Touched or Collected 1 Coin", "Player Ran", "Collected Star Coin"))
         self.type.addItems(("Time Trial", "Most Coins", "Fewest Coins", "Most Lives", "Fewest Enemies Hit", "Reach Goal", "Unknown (6)", "Unknown (7)", "Unknown (8)", "Unknown (9)", "Survival"))
+        self.mechanics.addItems(("Star Coins, Entrances, Powerups", "Star Coins, Entrances", "Star Coins, Powerups", "Star Coins", "Entrances, Powerups", "Entrances", "Powerups", "None"))
         self.challenge = 0
         self.updateFields(self.challenge)
 
@@ -439,6 +454,7 @@ class ChallengeViewer(QtWidgets.QWidget):
         self.babyyoshi.setEnabled(True)
         self.end.setEnabled(True)
         self.type.setEnabled(True)
+        self.mechanics.setEnabled(True)
 
     def saveFile(self):
         """Returns the file in saved form"""
@@ -468,18 +484,18 @@ class ChallengeViewer(QtWidgets.QWidget):
         self.id.setText(               str(challenge.id)           )
         self.prequel.setText(          str(challenge.prequel)      )
         self.time.setValue(            challenge.time              )
-        self.unk3.setText(             str(challenge.unk3)         )
+        self.mechanics.setCurrentIndex(        challenge.mechanics         )
         self.end.setCurrentIndex(      challenge.end               )
         self.type.setCurrentIndex(     challenge.type              )
         self.unk6.setText(             str(challenge.unk6)         )
         self.unk7.setText(             str(challenge.unk7)         )
         self.unk8.setText(             str(challenge.unk8)         )
-        self.complete.setText(     str(challenge.complete) )
+        self.complete.setText(         str(challenge.complete) )
         self.unk10.setText(            str(challenge.unk10)        )
         self.area.setText(             str(challenge.area + 1)     )
         self.entrance.setText(         str(challenge.entrance)     )
-        self.unk15.setText(            str(challenge.unk15)        )
-        self.unk16.setText(            str(challenge.unk16)        )
+        self.lvldisplay.setText(       str(challenge.lvldisplay + 1)        )
+        self.worldisplay.setText(      str(challenge.worldisplay + 1)        )
         self.goldenminimum.setText(    str(challenge.goldenminimum))
         self.silverminimum.setText(    str(challenge.silverminimum))
         self.bronzeminimum.setText(    str(challenge.bronzeminimum))
@@ -517,7 +533,7 @@ class ChallengeViewer(QtWidgets.QWidget):
         challenge.time =          self.time.value()
         challenge.stars =         self.stars.count()
         challenge.entrance =      int(self.entrance.text())
-        challenge.unk3 =          int(self.unk3.text())
+        challenge.mechanics =     self.mechanics.currentIndex()
         challenge.end =           self.end.currentIndex()
         challenge.type =          self.type.currentIndex()
         challenge.unk6 =          int(self.unk6.text())
@@ -526,8 +542,8 @@ class ChallengeViewer(QtWidgets.QWidget):
         challenge.complete =      int(self.complete.text())
         challenge.unk10 =         int(self.unk10.text())
         challenge.area  =         int(self.area.text()) - 1
-        challenge.unk15 =         int(self.unk15.text())
-        challenge.unk16 =         int(self.unk16.text())
+        challenge.lvldisplay =    int(self.lvldisplay.text()) - 1
+        challenge.worldisplay =   int(self.worldisplay.text()) - 1
         challenge.goldenminimum = int(self.goldenminimum.text())
         challenge.silverminimum = int(self.silverminimum.text())
         challenge.bronzeminimum = int(self.bronzeminimum.text())
