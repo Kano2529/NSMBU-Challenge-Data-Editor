@@ -223,7 +223,7 @@ class ChallengeViewer(QtWidgets.QWidget):
 
         
         worldisplayL = QtWidgets.QHBoxLayout()
-        worldisplayL.addWidget(QtWidgets.QLabel("Original Course Override"))
+        worldisplayL.addWidget(QtWidgets.QLabel("Original Course Display Override"))
         worldisplayL.addStretch(1)
         worldisplayL.addWidget(self.worldisplay)
         worldisplayL.addWidget(minus)
