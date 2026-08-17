@@ -208,10 +208,7 @@ class ChallengeViewer(QtWidgets.QWidget):
 
         areanentrance.addLayout(entranceL)
 
-        #location.setLayout(areanentrance)
-
-
-        #Display World & Level
+        # Display World & Level
         self.worldisplay = QtWidgets.QLineEdit()
         self.worldisplay.setFixedWidth(20)
         self.worldisplay.setMaxLength(2)
