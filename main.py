@@ -379,7 +379,7 @@ class ChallengeViewer(QtWidgets.QWidget):
         typeL.addWidget(self.type)
         q.addLayout(typeL)
 
-        #Enabled Mechanics
+        # Enabled Mechanics
         self.mechanics = QtWidgets.QComboBox()
         self.mechanics.setEnabled(False)
         self.mechanics.setFixedWidth(200)
