@@ -15,7 +15,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 import struct
 import os
-os.chdir(os.path.dirname(os.path.abspath(__fi)))
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 class Entry():
     """Class that represents an entry"""
