@@ -14,6 +14,8 @@ version = '1.2'
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 import struct
+import os
+os.chdir(os.path.dirname(os.path.abspath(__fi)))
 
 class Entry():
     """Class that represents an entry"""
